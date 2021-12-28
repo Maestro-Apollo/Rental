@@ -6,11 +6,7 @@ class search extends database
 {
     public function searchFunction()
     {
-
-
-
-
-        $user = $_SESSION['name'];
+        $user = ($_SESSION['name']) ? $_SESSION['name'] : $_SESSION['admin'];
         $insertId = $_POST['id'];
 
         for ($i = 0; $i < count($_FILES['booking_file']['name']); $i++) {

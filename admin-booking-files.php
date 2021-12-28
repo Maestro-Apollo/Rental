@@ -172,10 +172,7 @@ if (isset($_SESSION['admin'])) {
             'url': 'ajax-file.php',
             "data": {
                 'booking_id': '<?php echo $_GET['id']; ?>',
-
             }
-
-
         },
         'columns': [{
             data: 'line_number'
