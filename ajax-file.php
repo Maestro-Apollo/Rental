@@ -61,10 +61,19 @@ if ($request == 1) {
 
         $fileName = '<a href="files/' . $row['file_name'] . '">' . $var[1] . '</a>';
 
+        if (preg_match('/\.(jpg|png|jpeg|gif|tiff)$/', strtolower($row['file_name']))) {
+            $thumbnail = '<a target="_blank" href="files/' . $row['file_name'] . '"><img src="files/' . $row['file_name'] . '"</a>';
+        } else {
+            $thumbnail = '';
+        }
+
+
+
 
         $data[] = array(
 
             "line_number" => 'F-' . $row['file_id'],
+            "thumbnail" => $thumbnail,
             "file_name" => $fileName,
             "file_created_at" => $row['file_created_at'],
             "action" => $action

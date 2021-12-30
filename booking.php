@@ -69,6 +69,8 @@ if (isset($_SESSION['name'])) {
                                 name="company_com" placeholder="TAC" required readonly>
                             <input type="text" autocomplete="off" class="form-control mt-4 p-4  bg-light" name="tcc"
                                 placeholder="TCC" required readonly>
+                            <textarea name="comment" placeholder="Comment" class="form-control mt-4  bg-light" id=""
+                                cols="30" rows="3"></textarea>
                             <input class="multifile mt-4" type="file" name="booking_file[]">
                             <!-- <div class="pl-2 pr-2" id="output3">
                                 <div class="row">

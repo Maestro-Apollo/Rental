@@ -115,6 +115,7 @@ if (isset($_SESSION['admin'])) {
                     <thead>
                         <tr>
                             <th>File Number</th>
+                            <th>Thumbnail</th>
                             <th>File Name</th>
                             <th>File Created At</th>
                             <th>Action</th>
@@ -176,6 +177,8 @@ if (isset($_SESSION['admin'])) {
         },
         'columns': [{
             data: 'line_number'
+        }, {
+            data: 'thumbnail'
         }, {
             data: 'file_name'
         }, {

@@ -107,6 +107,23 @@ class search extends database
 
         # code...
     }
+    public function fileFunction($id)
+    {
+        $sql = "SELECT count(*) as file_num from file_tbl where booking_id = $id";
+        $res = mysqli_query($this->link, $sql);
+
+        if ($res) {
+            $row = mysqli_fetch_assoc($res);
+            $fileNum = $row['file_num'];
+
+            return $fileNum;
+        } else {
+            return 0;
+        }
+
+
+        # code...
+    }
 }
 $obj = new search;
 $objData = $obj->searchFunction();
@@ -365,7 +382,8 @@ $objData = $obj->searchFunction();
                                 <?php echo $row['agent_com_tenant']; ?></td>
                             <td><?php echo $row['company_com']; ?></td>
                             <td><?php echo $row['tcc']; ?></td>
-                            <td><a href="./admin-booking-files.php?id=<?php echo $row['booking_id']; ?>"><i
+                            <td><?php echo $obj->fileFunction($row['booking_id']); ?><a
+                                    href="./admin-booking-files.php?id=<?php echo $row['booking_id']; ?>"><i
                                         class="fas fa-folder-open fa-2x text-white"></i></a></td>
 
                         </tr>

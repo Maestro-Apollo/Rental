@@ -124,6 +124,7 @@ if (mysqli_num_rows($res) > 0) {
                     <thead>
                         <tr>
                             <th>File Number</th>
+                            <th>Thumbnail</th>
                             <th>File Name</th>
                             <th>File Created At</th>
                             <th>Action</th>
@@ -188,6 +189,8 @@ if (mysqli_num_rows($res) > 0) {
         },
         'columns': [{
             data: 'line_number'
+        }, {
+            data: 'thumbnail'
         }, {
             data: 'file_name'
         }, {

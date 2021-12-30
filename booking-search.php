@@ -34,6 +34,23 @@ class search extends database
 
         # code...
     }
+    public function fileFunction($id)
+    {
+        $sql = "SELECT count(*) as file_num from file_tbl where booking_id = $id";
+        $res = mysqli_query($this->link, $sql);
+
+        if ($res) {
+            $row = mysqli_fetch_assoc($res);
+            $fileNum = $row['file_num'];
+
+            return $fileNum;
+        } else {
+            return 0;
+        }
+
+
+        # code...
+    }
     public function allTransaction($booking_id)
     {
 
@@ -47,14 +64,15 @@ class search extends database
             $color3 = '';
             $i = 0;
             $arr = array();
+
             while ($find = mysqli_fetch_assoc($res)) {
                 $i++;
+                $arr['thick1'] = '';
+                $arr['thick2'] = false;
+                $tot3 = 0;
+
                 $s = strtolower($find['description']);
-                // $arr['color'] = preg_match('~\\bcl\\b~i', $s, $m) ?  'bg-success' : '';
-                // // if () {
-                // //     $color = ;
-                // //      = $color;
-                // // }
+
                 if (preg_match('~\\bcl\\b~i', $s, $m)) {
                     $color = 'bg-success';
                     $arr['color'] = $color;
@@ -63,14 +81,25 @@ class search extends database
                     $color1 = 'bg-success';
                     $arr['color1'] = $color1;
                 }
+
                 if (preg_match('~\\bacl\\b~i', $s, $m)) {
                     $color2 = 'bg-success';
                     $arr['color2'] = $color2;
+                }
+                if (isset($arr['color']) != '' and isset($arr['color2']) == '') {
+                    $tot3 += $find['agent_com_landloard'];
+                    $arr['thick1'] = "thick";
                 }
                 if (preg_match('~\\bact\\b~i', $s, $m)) {
                     $color3 = 'bg-success';
                     $arr['color3'] = $color3;
                 }
+                if (isset($arr['color1']) != '' and isset($arr['color3']) == '') {
+                    $tot3 += $find['agent_com_tenant'];
+                    $arr['thick2'] = "thick";
+                }
+
+                $arr['tot3'] = $tot3;
             }
             return $arr;
         } else {
@@ -141,6 +170,7 @@ $objData = $obj->searchFunction();
                     <div class="col-md-4">
                         <input type="text" name="fromDate" data-toggle="datepicker" class="form-control mt-4  bg-light"
                             placeholder="From Date" autocomplete="off" required>
+
                     </div>
                     <div class="col-md-4">
                         <input type="text" data-toggle="datepicker" name="toDate" class="form-control mt-4  bg-light"
@@ -153,6 +183,12 @@ $objData = $obj->searchFunction();
                             <option value="Complete">Complete</option>
                             <option value="Incomplete">Incomplete</option>
                         </select>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group form-check mt-2">
+                            <input type="checkbox" class="form-check-input" name="tcr" value="1" id="exampleCheck1">
+                            <label class="form-check-label" for="exampleCheck1">For TCR</label>
+                        </div>
                     </div>
                 </div>
                 <button name="signup" type="submit" class="btn font-weight-bold log_btn mt-4">Calculate</button>
@@ -180,15 +216,32 @@ $objData = $obj->searchFunction();
                     </thead>
                     <tbody>
                         <?php if ($objData) {
-                            $tot = 0; ?>
+                            $tot = 0;
+                            $comTot = 0; ?>
                         <?php while ($row = mysqli_fetch_assoc($objData)) { ?>
+
+                        <?php if (isset($_POST['tcr'])) {
+                                    $equ = !empty(($obj->allTransaction($row['booking_id'])['tot3']));
+                                } else {
+                                    $equ = true;
+                                }
+
+                                if ($equ) { ?>
+
                         <tr class="text-white <?php if ($row['status'] == 'Incomplete') {
-                                                            echo 'bg-danger';
-                                                        } else {
-                                                            echo 'bg-success';
-                                                        } ?>">
+                                                                echo 'bg-danger';
+                                                            } else {
+                                                                echo 'bg-success';
+                                                            } ?>">
                             <td><a class="text-white"
                                     href="./booking-shared.php?id=<?php echo $row['booking_id']; ?>"><?php echo $row['property_name']; ?>
+                                    <?php if ($row['shared_with'] == $row['agent_name']) {
+                                                    echo ' (S)';
+                                                } else if ($row['shared_with']) {
+                                                    echo ' (M)';
+                                                } else {
+                                                    echo '';
+                                                } ?>
                                     <?php if ($row['shared_with']) { ?>
                                     <i class="fas fa-share"></i>
                                     <?php } ?></a>
@@ -196,23 +249,36 @@ $objData = $obj->searchFunction();
                             <td><?php echo date("d/m/Y", strtotime($row['date'])) ?></td>
                             <td><?php echo $row['agent_com']; ?></td>
                             <td><?php echo $row['rent']; ?></td>
+
+                            <?php if (isset($obj->allTransaction($row['booking_id'])['tot3'])) {
+                                            $comTot += $obj->allTransaction($row['booking_id'])['tot3'];
+                                        } ?>
+
                             <td class="<?php if (isset($obj->allTransaction($row['booking_id'])['color'])) {
-                                                    echo $obj->allTransaction($row['booking_id'])['color'];
-                                                } ?>"><?php echo $row['com_landlord']; ?></td>
+                                                        echo $obj->allTransaction($row['booking_id'])['color'];
+                                                    } ?>"><?php echo $row['com_landlord']; ?></td>
                             <td class="<?php if (isset($obj->allTransaction($row['booking_id'])['color1'])) {
-                                                    echo $obj->allTransaction($row['booking_id'])['color1'];
-                                                } ?>"><?php echo $row['com_tenant']; ?></td>
+                                                        echo $obj->allTransaction($row['booking_id'])['color1'];
+                                                    } ?>"><?php echo $row['com_tenant']; ?></td>
                             <?php $tot += $row['company_com']; ?>
                             <td class="<?php if (isset($obj->allTransaction($row['booking_id'])['color2'])) {
-                                                    echo $obj->allTransaction($row['booking_id'])['color2'];
-                                                } ?>"><?php echo $row['agent_com_landloard']; ?></td>
+                                                        echo $obj->allTransaction($row['booking_id'])['color2'];
+                                                    }
+                                                    if (isset($obj->allTransaction($row['booking_id'])['thick1'])) {
+                                                        echo $obj->allTransaction($row['booking_id'])['thick1'];
+                                                    } ?>"><?php echo $row['agent_com_landloard']; ?></td>
                             <td class="<?php if (isset($obj->allTransaction($row['booking_id'])['color3'])) {
-                                                    echo $obj->allTransaction($row['booking_id'])['color3'];
-                                                } ?>"><?php echo $row['agent_com_tenant']; ?></td>
+                                                        echo $obj->allTransaction($row['booking_id'])['color3'];
+                                                    }
+                                                    if (isset($obj->allTransaction($row['booking_id'])['thick2'])) {
+                                                        echo $obj->allTransaction($row['booking_id'])['thick2'];
+                                                    } ?>"><?php echo $row['agent_com_tenant']; ?></td>
                             <td><?php echo $row['company_com']; ?></td>
-                            <td><a href="./booking-files.php?id=<?php echo $row['booking_id']; ?>"><i
+                            <td><?php echo $obj->fileFunction($row['booking_id']); ?><br><a
+                                    href="./booking-files.php?id=<?php echo $row['booking_id']; ?>"><i
                                         class="fas fa-folder-open fa-2x text-white"></i></a></td>
                         </tr>
+                        <?php } ?>
                         <?php } ?>
                         <!-- <tr>
                             <th colspan="9"><?php echo $tot; ?></th>
@@ -229,8 +295,8 @@ $objData = $obj->searchFunction();
                             <th></th>
                             <th></th>
                             <th></th>
-                            <th></th>
-                            <th></th>
+                            <th>T.C.R =</th>
+                            <th><?php echo $comTot; ?></th>
                             <th><?php echo $tot; ?></th>
                             <th class="not-export-column"></th>
                         </tr>
@@ -267,7 +333,7 @@ $objData = $obj->searchFunction();
     <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.print.min.js"></script>
     <script>
     $(document).ready(function() {
-        $('#example').DataTable({
+        let output_table = $('#example').DataTable({
             responsive: false,
             dom: 'Bfrtip',
             "order": false,
@@ -293,6 +359,44 @@ $objData = $obj->searchFunction();
 
                 exportOptions: {
                     columns: ":not(.not-export-column)"
+                },
+                customize: function(xlsx) {
+
+                    var sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+                    console.log(sheet);
+                    var row = 0;
+                    var num_columns = 11;
+
+                    $('row', sheet).each(function(x) {
+                        if (x > 2) {
+
+                            console.log("");
+                            console.log("---- row x: " + x);
+
+                            for (var i = 0; i < num_columns; i++) {
+
+                                console.log("---- column i: " + i);
+
+                                console.log(output_table.row(':eq(' + row + ')')
+                                    .data());
+
+                                if ($(output_table.cell(':eq(' + row + ')', i)
+                                        .node()).hasClass('thick')) {
+                                    console.log('YES - sig-w - row ' + row +
+                                        ', column ' + i);
+                                    $('row:nth-child(' + (x) + ') c', sheet).eq(i)
+                                        .attr('s', '20');
+
+                                }
+
+                            }
+
+                            row++;
+                        }
+
+                    });
+
                 }
             }],
 

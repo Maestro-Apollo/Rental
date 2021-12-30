@@ -19,9 +19,10 @@ class search extends database
     $tenant_com_per = addslashes(trim($_POST['tenant_com_per']));
     $company_com = addslashes(trim($_POST['company_com']));
     $tcc = addslashes(trim($_POST['tcc']));
+    $comment = addslashes(trim($_POST['comment']));
 
 
-    $sql = "INSERT INTO `booking_tbl` (`booking_id`, `agent_name`, `property_name`, `date`, `agent_com`, `rent`, `com_landlord`, `com_tenant`, `agent_com_landloard`, `agent_com_tenant`, `company_com`,`tcc`,`status`, `admin_comment`,`staff_comment`, `created_at`) VALUES (NULL, '$user', '$property_name', '$date', '$agent_com', '$rent', '$land_com', '$tenant_com', '$agent_com_per', '$tenant_com_per', '$company_com', '$tcc','Incomplete', '','', CURRENT_TIMESTAMP)";
+    $sql = "INSERT INTO `booking_tbl` (`booking_id`, `agent_name`, `property_name`, `date`, `agent_com`, `rent`, `com_landlord`, `com_tenant`, `agent_com_landloard`, `agent_com_tenant`, `company_com`,`tcc`,`status`, `admin_comment`,`staff_comment`, `created_at`) VALUES (NULL, '$user', '$property_name', '$date', '$agent_com', '$rent', '$land_com', '$tenant_com', '$agent_com_per', '$tenant_com_per', '$company_com', '$tcc','Incomplete', '','$comment', CURRENT_TIMESTAMP)";
     $res = mysqli_query($this->link, $sql);
 
     $insertId = mysqli_insert_id($this->link);
